@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
+import { useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
 import { storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ControlButtonTooltip from '../controls-island/control-button-tooltip.vue'
@@ -13,8 +14,11 @@ import { electronOpenSettings } from '../../../../shared/eventa'
 const { t } = useI18n()
 const { connected } = storeToRefs(useModsServerChannelStore())
 const openSettings = useElectronEventaInvoke(electronOpenSettings)
-const flickerDuration = ref('6.4s')
-const flickerDelay = ref('0s')
+
+const { flickerStyle, onAnimationIteration } = useLampFlickerAnimation(
+  () => !connected.value,
+  { delay: '--status-island-flicker-delay', duration: '--status-island-flicker-duration' },
+)
 
 const statusIslandSize = {
   border: 'border-2',
@@ -44,17 +48,6 @@ const iconClasses = computed(() => {
   ]
 })
 
-const iconStyle = computed(() => {
-  if (connected.value) {
-    return undefined
-  }
-
-  return {
-    '--status-island-flicker-delay': flickerDelay.value,
-    '--status-island-flicker-duration': flickerDuration.value,
-  }
-})
-
 const buttonLabel = computed(() => {
   return connected.value
     ? t('stage.websocket-status.connected')
@@ -64,32 +57,6 @@ const buttonLabel = computed(() => {
 const tooltipLabel = computed(() => {
   return `${buttonLabel.value}. ${t('stage.websocket-status.open-settings')}`
 })
-
-function randomizeFlicker(resetPhase = false) {
-  flickerDuration.value = `${(5.8 + Math.random() * 1.8).toFixed(2)}s`
-
-  if (resetPhase) {
-    flickerDelay.value = `${(-Math.random() * 5.4).toFixed(2)}s`
-    return
-  }
-
-  flickerDelay.value = '0s'
-}
-
-function handleFlickerIteration() {
-  if (!connected.value) {
-    randomizeFlicker()
-  }
-}
-
-watch(connected, (isConnected) => {
-  if (isConnected) {
-    flickerDelay.value = '0s'
-    return
-  }
-
-  randomizeFlicker(true)
-}, { immediate: true })
 </script>
 
 <template>
@@ -101,7 +68,7 @@ watch(connected, (isConnected) => {
         :title="tooltipLabel"
         @click="openSettings({ route: '/settings/connection' })"
       >
-        <div :class="iconClasses" :style="iconStyle" @animationiteration="handleFlickerIteration" />
+        <div :class="iconClasses" :style="flickerStyle" @animationiteration="onAnimationIteration" />
       </ControlButton>
       <template #tooltip>
         {{ tooltipLabel }}

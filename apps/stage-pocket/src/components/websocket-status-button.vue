@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
 import { storeToRefs } from 'pinia'
 import { TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
@@ -10,8 +11,10 @@ const { t } = useI18n()
 const router = useRouter()
 const { connected } = storeToRefs(useModsServerChannelStore())
 
-const flickerDuration = ref('6.4s')
-const flickerDelay = ref('0s')
+const { flickerStyle, onAnimationIteration } = useLampFlickerAnimation(
+  () => !connected.value,
+  { delay: '--pocket-ws-flicker-delay', duration: '--pocket-ws-flicker-duration' },
+)
 
 const statusSize = {
   border: 'border-2',
@@ -43,17 +46,6 @@ const iconClasses = computed(() => {
   ]
 })
 
-const iconStyle = computed(() => {
-  if (connected.value) {
-    return undefined
-  }
-
-  return {
-    '--pocket-ws-flicker-delay': flickerDelay.value,
-    '--pocket-ws-flicker-duration': flickerDuration.value,
-  }
-})
-
 const buttonLabel = computed(() => {
   return connected.value
     ? t('stage.websocket-status.connected')
@@ -63,32 +55,6 @@ const buttonLabel = computed(() => {
 const tooltipLabel = computed(() => {
   return `${buttonLabel.value}. ${t('stage.websocket-status.open-settings')}`
 })
-
-function randomizeFlicker(resetPhase = false) {
-  flickerDuration.value = `${(5.8 + Math.random() * 1.8).toFixed(2)}s`
-
-  if (resetPhase) {
-    flickerDelay.value = `${(-Math.random() * 5.4).toFixed(2)}s`
-    return
-  }
-
-  flickerDelay.value = '0s'
-}
-
-function handleFlickerIteration() {
-  if (!connected.value) {
-    randomizeFlicker()
-  }
-}
-
-watch(connected, (isConnected) => {
-  if (isConnected) {
-    flickerDelay.value = '0s'
-    return
-  }
-
-  randomizeFlicker(true)
-}, { immediate: true })
 
 function openConnectionSettings() {
   void router.push('/settings/connection')
@@ -112,8 +78,8 @@ function openConnectionSettings() {
           >
             <div
               :class="iconClasses"
-              :style="iconStyle"
-              @animationiteration="handleFlickerIteration"
+              :style="flickerStyle"
+              @animationiteration="onAnimationIteration"
             />
           </button>
         </TooltipTrigger>
