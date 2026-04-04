@@ -2,20 +2,17 @@ import type { MaybeRefOrGetter } from 'vue'
 
 import { computed, ref, toValue, watch } from 'vue'
 
-/** CSS custom property names bound to animation-delay and animation-duration. */
-export interface LampFlickerCssVars {
-  delay: string
-  duration: string
-}
+/** Matches `.lamp-flicker-animation` in `@proj-airi/stage-ui/styles/lamp-flicker.css` (import that CSS once per app). */
+export const lampFlickerAnimationClass = 'lamp-flicker-animation' as const
+
+const LAMP_FLICKER_DELAY_VAR = '--lamp-flicker-delay'
+const LAMP_FLICKER_DURATION_VAR = '--lamp-flicker-duration'
 
 /**
- * Drives randomized keyframe timing for a “lamp flicker” opacity animation while `flickerActive` is true.
- * When inactive, delay resets to 0s so the icon looks steady.
+ * Drives randomized keyframe timing for the shared lamp-flicker CSS while `flickerActive` is true.
+ * When inactive, delay resets to 0s so the element looks steady.
  */
-export function useLampFlickerAnimation(
-  flickerActive: MaybeRefOrGetter<boolean>,
-  cssVars: LampFlickerCssVars,
-) {
+export function useLampFlickerAnimation(flickerActive: MaybeRefOrGetter<boolean>) {
   const flickerDuration = ref('6.4s')
   const flickerDelay = ref('0s')
 
@@ -55,8 +52,8 @@ export function useLampFlickerAnimation(
     }
 
     return {
-      [cssVars.delay]: flickerDelay.value,
-      [cssVars.duration]: flickerDuration.value,
+      [LAMP_FLICKER_DELAY_VAR]: flickerDelay.value,
+      [LAMP_FLICKER_DURATION_VAR]: flickerDuration.value,
     } as Record<string, string>
   })
 

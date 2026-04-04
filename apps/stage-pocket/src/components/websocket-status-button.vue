@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
+import { lampFlickerAnimationClass, useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
 import { storeToRefs } from 'pinia'
 import { TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
@@ -11,10 +11,7 @@ const { t } = useI18n()
 const router = useRouter()
 const { connected } = storeToRefs(useModsServerChannelStore())
 
-const { flickerStyle, onAnimationIteration } = useLampFlickerAnimation(
-  () => !connected.value,
-  { delay: '--pocket-ws-flicker-delay', duration: '--pocket-ws-flicker-duration' },
-)
+const { flickerStyle, onAnimationIteration } = useLampFlickerAnimation(() => !connected.value)
 
 const statusSize = {
   border: 'border-2',
@@ -37,7 +34,7 @@ const buttonClass = computed(() => {
 
 const iconClasses = computed(() => {
   return [
-    connected.value ? 'i-ph:wifi-high' : 'i-ph:wifi-slash pocket-ws-status-flicker',
+    connected.value ? 'i-ph:wifi-high' : `i-ph:wifi-slash ${lampFlickerAnimationClass}`,
     statusSize.icon,
     'shrink-0 transition-colors duration-300 ease-in-out',
     connected.value
@@ -115,88 +112,5 @@ function openConnectionSettings() {
 .pocket-ws-tooltip-fade-enter-to,
 .pocket-ws-tooltip-fade-leave-from {
   opacity: 1;
-}
-
-@keyframes pocket-ws-lamp-flicker {
-  0%,
-  6%,
-  22%,
-  33%,
-  52%,
-  68%,
-  86%,
-  100% {
-    opacity: 1;
-  }
-
-  3% {
-    opacity: 0.74;
-  }
-
-  9% {
-    opacity: 0.92;
-  }
-
-  13% {
-    opacity: 0.38;
-  }
-
-  18% {
-    opacity: 0.58;
-  }
-
-  27% {
-    opacity: 0.44;
-  }
-
-  29% {
-    opacity: 0.84;
-  }
-
-  41% {
-    opacity: 0.42;
-  }
-
-  45% {
-    opacity: 0.88;
-  }
-
-  57% {
-    opacity: 0.62;
-  }
-
-  61% {
-    opacity: 0.8;
-  }
-
-  73% {
-    opacity: 0.36;
-  }
-
-  74.4% {
-    opacity: 0.08;
-  }
-
-  75.2% {
-    opacity: 0.82;
-  }
-
-  78% {
-    opacity: 0.94;
-  }
-
-  91% {
-    opacity: 0.52;
-  }
-}
-
-.pocket-ws-status-flicker {
-  animation-delay: var(--pocket-ws-flicker-delay, 0s);
-  animation-duration: var(--pocket-ws-flicker-duration, 6.4s);
-  animation-iteration-count: infinite;
-  animation-name: pocket-ws-lamp-flicker;
-  animation-timing-function: ease-in-out;
-  filter: drop-shadow(0 0 0.14rem rgb(251 191 36 / 0.18));
-  will-change: opacity;
 }
 </style>

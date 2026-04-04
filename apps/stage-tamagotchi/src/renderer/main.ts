@@ -15,6 +15,7 @@ import App from './App.vue'
 
 import { i18n } from './modules/i18n'
 
+import '@proj-airi/stage-ui/styles/lamp-flicker.css'
 import '@unocss/reset/tailwind.css'
 import 'splitpanes/dist/splitpanes.css'
 import 'vue-sonner/style.css'
