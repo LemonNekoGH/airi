@@ -10,7 +10,7 @@ import ControlButton from '../controls-island/control-button.vue'
 
 import { electronOpenSettings } from '../../../../shared/eventa'
 
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { connected } = storeToRefs(useModsServerChannelStore())
 const openSettings = useElectronEventaInvoke(electronOpenSettings)
 const flickerDuration = ref('6.4s')
@@ -56,23 +56,13 @@ const iconStyle = computed(() => {
 })
 
 const buttonLabel = computed(() => {
-  if (connected.value) {
-    return te('tamagotchi.stage.status-island.connected')
-      ? t('tamagotchi.stage.status-island.connected')
-      : 'WebSocket connected'
-  }
-
-  return te('tamagotchi.stage.status-island.disconnected')
-    ? t('tamagotchi.stage.status-island.disconnected')
-    : 'WebSocket disconnected'
+  return connected.value
+    ? t('stage.websocket-status.connected')
+    : t('stage.websocket-status.disconnected')
 })
 
 const tooltipLabel = computed(() => {
-  const openSettingsLabel = te('tamagotchi.stage.status-island.open-settings')
-    ? t('tamagotchi.stage.status-island.open-settings')
-    : 'Open WebSocket settings'
-
-  return `${buttonLabel.value}. ${openSettingsLabel}`
+  return `${buttonLabel.value}. ${t('stage.websocket-status.open-settings')}`
 })
 
 function randomizeFlicker(resetPhase = false) {
