@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { lampFlickerAnimationClass, useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
+import { useLampFlickerAnimation } from '@proj-airi/stage-ui/composables/use-lamp-flicker-animation'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
+import { lampFlickerAnimationClass } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
 import { computed } from 'vue'
